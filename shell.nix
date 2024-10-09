@@ -15,4 +15,7 @@ pkgs.mkShell {
   shellHook = ''
     ${pkgs.onefetch}/bin/onefetch
   '';
+
+  ASAN_OPTIONS = "abort_on_error=1:halt_on_error=1";
+  UBSAN_OPTIONS = "abort_on_error=1:halt_on_error=1";
 }
