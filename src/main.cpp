@@ -1,22 +1,21 @@
-#include <iostream>
-
-#include "../cstd/base.cpp"
+#include <stdio.h>
+#include "base/base.cpp"
 
 int main() {
 #if 1
-  std::cout << "Compiler GCC:   " << COMPILER_GCC << std::endl;
-  std::cout << "Compiler CL:    " << COMPILER_CL << std::endl;
-  std::cout << "Compiler CLANG: " << COMPILER_CLANG << std::endl << std::endl;
+  printf("Compiler GCC:   %d\n", COMPILER_GCC);
+  printf("Compiler CL:    %d\n", COMPILER_CL);
+  printf("Compiler CLANG: %d\n", COMPILER_CLANG);
 
-  std::cout << "OS GNU/Linux:   " << OS_LINUX << std::endl;
-  std::cout << "OS BSD:         " << OS_BSD << std::endl;
-  std::cout << "OS MAC:         " << OS_MAC << std::endl;
-  std::cout << "OS Windows:     " << OS_WINDOWS << std::endl << std::endl;
+  printf("OS GNU/Linux:   %d\n", OS_LINUX);
+  printf("OS BSD:         %d\n", OS_BSD);
+  printf("OS MAC:         %d\n", OS_MAC);
+  printf("OS Windows:     %d\n", OS_WINDOWS);
 
-  std::cout << "Architecture x86 32bit: " << ARCH_X86 << std::endl;
-  std::cout << "Architecture x64 64bit: " << ARCH_X64 << std::endl;
-  std::cout << "Architecture ARM 32bit: " << ARCH_ARM << std::endl;
-  std::cout << "Architecture ARM 64bit: " << ARCH_ARM64 << std::endl << std::endl;
+  printf("Architecture x86 32bit: %d\n", ARCH_X86);
+  printf("Architecture x64 64bit: %d\n", ARCH_X64);
+  printf("Architecture ARM 32bit: %d\n", ARCH_ARM);
+  printf("Architecture ARM 64bit: %d\n", ARCH_ARM64);
 #endif
 
 }
