@@ -6,4 +6,4 @@ else
     flags="-O0 -ggdb -fno-exceptions -Wno-cpp -fsanitize=address,undefined -g3"
 fi
 
-g++ src/main.cpp -o main $flags
+g++ src/main.cpp -o main $flags -fvisibility=hidden
