@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "base/base.cpp"
+
+#include "base/base.h"
 
 int main() {
 #if 1
