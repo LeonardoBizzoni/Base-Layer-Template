@@ -6,7 +6,10 @@ pkgs.mkShell {
     man-pages-posix
 
     gf
+    gcc
+    clang
     clang-tools
+    universal-ctags
 
     tree-sitter-grammars.tree-sitter-cpp
     tree-sitter-grammars.tree-sitter-c

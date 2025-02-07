@@ -1,9 +1,12 @@
 #include <stdio.h>
 
-#include "base/base_inc.h"
-#include "base/base_inc.c"
+#include <base/base_inc.h>
+#include <OS/os_inc.h>
 
-int main() {
+#include <base/base_inc.c>
+#include <OS/os_inc.c>
+
+fn void start(CmdLine *cli) {
 #if 1
   printf("Compiler GCC:   %d\n", COMPILER_GCC);
   printf("Compiler CL:    %d\n", COMPILER_CL);
