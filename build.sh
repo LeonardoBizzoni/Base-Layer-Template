@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 set -eu
 
-file="main.c"
+file="src/main.c"
 
 for arg in "$@"; do
     if [[ $arg == *=* ]]; then
@@ -14,20 +14,86 @@ for arg in "$@"; do
     fi
 done
 
-common_link="-lpthread -lm"
-common_flags="-pedantic -Wall -Wno-unused-function -Wno-gnu-anonymous-struct -Wno-nested-anon-types"
-common_cpp="-std=c++23 -fno-exceptions"
-common_gui="-DOS_GUI=1"
+links="-lpthread -lm -I./src/base"
+common_flags="-pedantic -Wall -Werror"
+no_annoying_warnings="-Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments
+                      -Wno-initializer-overrides -Wno-c23-extensions"
+no_annoying_cpp_warnings="-Wno-gnu-anonymous-struct -Wno-gnu-anonymous-struct
+                          -Wno-nested-anon-types"
 
-common_opt="-O3 -s"
-common_dbg="-O0 -g3 -fvisibility=hidden -DENABLE_ASSERT=1 -DDEBUG=1"
+opt_flags="-O3 -s"
+dbg_flags="-O0 -g3 -fvisibility=hidden -ggdb -DENABLE_ASSERT=1 -DDEBUG=1"
 
-lnx_dbg="-ggdb -fsanitize=address,undefined"
-bsd_dbg="-ggdb"
+asan="-fsanitize=address,undefined"
+gui_mode="-DOS_GUI=1"
+cpp_mode="-std=c++23 -fno-exceptions"
 
 if [ ! -v release ]; then debug=1; fi
+if [ ! -v gcc ];     then clang=1; fi
 
-if [ -v cross ]; then
+if [ -v gcc ];   then compiler=$([ -v cpp ] && echo "g++" || echo "gcc");         fi
+if [ -v clang ]; then compiler=$([ -v cpp ] && echo "clang++" || echo "clang");   fi
+
+if [ ! -v cross ]; then
+    case "$(uname)" in
+        "Linux")
+            os="LNX"
+            if [ -v gui ]; then
+                display_server=$(echo "$XDG_SESSION_TYPE")
+            fi
+            ;;
+        *BSD*)
+            os="BSD"
+            if [ -v gui ]; then
+                display_server=$(echo "$XDG_SESSION_TYPE")
+            fi
+            ;;
+        "Darwin")
+            os="MACOS"
+            ;;
+        *)
+            exit -1
+            ;;
+    esac
+
+    flags="$links $common_flags $no_annoying_warnings "
+    if [ -v cpp ]; then flags+="$no_annoying_cpp_warnings $cpp_mode "; fi
+
+    if [ -v debug ]; then
+        flags+="$dbg_flags "
+        if [ "$os" == "LNX" ]; then
+            flags+="$asan "
+        # elif [ "$os" == "BSD" ]; then
+        #     i can't get asan to work on bsd
+        # elif [ "$os" == "MACOS" ]; then
+        #     don't know if asan works on macos
+        fi
+    else
+        flags+="$opt_flags "
+    fi
+
+    if [ -v gui ]; then
+        flags+="$gui_mode "
+        if [[ $os == "LNX" || $os == "BSD" ]]; then
+            if [ "$display_server" == "x11" ]; then
+                flags+="-D${os}_X11=1 -lX11 -lXext "
+            else
+                flags+="-D${os}_Wayland=1 "
+            fi
+        fi
+
+        if [ -v opengl ]; then
+            flags+="-lGL -lGLU -DUSING_OPENGL=1 "
+        fi
+    fi
+
+    if   [ -v gcc ];   then printf "+ [ GNU "
+    elif [ -v clang ]; then printf "+ [ Clang "; fi
+
+    if [ -v cpp ];   then printf "C++ "; else printf "C "; fi; printf "compilation ]\n"
+    if [ -v debug ]; then echo "+ [ debug mode ]"; else echo "+ [ release mode ]"; fi
+    (set -x; $compiler $flags $file -o main)
+else
     case "${cross,,}" in
         "atmega328p")
             compiler=$([ -v cpp ] && echo "avr-g++" || echo "avr-gcc")
@@ -93,69 +159,4 @@ if [ -v cross ]; then
             exit -1
             ;;
     esac
-else
-    if [ ! -v gcc ]; then clang=1; fi
-
-    if [ -v gcc ];   then compiler=$([ -v cpp ] && echo "g++" || echo "gcc");         fi
-    if [ -v clang ]; then compiler=$([ -v cpp ] && echo "clang++" || echo "clang");   fi
-
-    case "$(uname)" in
-        "Linux")
-            os="LNX"
-            if [ -v gui ]; then
-                display_server=$(echo "$XDG_SESSION_TYPE")
-            fi
-            ;;
-        *BSD*)
-            os="BSD"
-            if [ -v gui ]; then
-                display_server=$(echo "$XDG_SESSION_TYPE")
-            fi
-            ;;
-        "Darwin")
-            os="MACOS"
-            ;;
-        *)
-            exit -1
-            ;;
-    esac
-
-    flags="$common_flags $common_link "
-    if [ -v cpp ]; then flags+="$common_cpp "; fi
-
-    if [ -v debug ]; then
-        flags+="$common_dbg "
-        if [ "$os" == "LNX" ]; then
-            flags+="$lnx_dbg "
-        elif [ "$os" == "BSD" ]; then
-            flags+="$bsd_dbg "
-        elif [ "$os" == "MACOS" ]; then
-            flags+="$macos_dbg "
-        fi
-    else
-        flags+="$common_opt "
-    fi
-
-    if [ -v gui ]; then
-        flags+="$common_gui "
-        if [[ $os == "LNX" || $os == "BSD" ]]; then
-            if [ "$display_server" == "x11" ]; then
-                flags+="-D${os}_X11=1 -lX11 -lXext "
-            else
-                flags+="-D${os}_Wayland=1 "
-            fi
-        fi
-
-        if [ -v opengl ]; then
-            flags+="-lGL -lGLU -DUSING_OPENGL=1 "
-        fi
-    fi
-
-    if   [ -v gcc ];   then printf "+ [ GNU "
-    elif [ -v clang ]; then printf "+ [ Clang "
-    fi
-
-    [ -v cpp ] && printf "C++ " || printf "C "; printf "compilation ]\n"
-    [ -v debug ] && echo "+ [ debug mode ]" || echo "+ [ release mode ]"
-    (set -x; $compiler $flags $file -o main)
 fi

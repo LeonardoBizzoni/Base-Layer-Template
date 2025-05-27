@@ -19,7 +19,7 @@ fn void start(CmdLine *cli) {
 
   printf("Architecture x86 32bit: %d\n", ARCH_X86);
   printf("Architecture x64 64bit: %d\n", ARCH_X64);
-  printf("Architecture ARM 32bit: %d\n", ARCH_ARM);
+  printf("Architecture ARM 32bit: %d\n", ARCH_ARM32);
   printf("Architecture ARM 64bit: %d\n", ARCH_ARM64);
 #endif
 
