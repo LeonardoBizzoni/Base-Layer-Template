@@ -8,19 +8,19 @@
 
 fn void start(CmdLine *cli) {
 #if 1
-  printf("Compiler GCC:   %d\n", COMPILER_GCC);
-  printf("Compiler CL:    %d\n", COMPILER_CL);
-  printf("Compiler CLANG: %d\n", COMPILER_CLANG);
+  Info("Compiler GCC:   %d", COMPILER_GCC);
+  Info("Compiler CL:    %d", COMPILER_CL);
+  Info("Compiler CLANG: %d", COMPILER_CLANG);
 
-  printf("OS GNU/Linux:   %d\n", OS_LINUX);
-  printf("OS BSD:         %d\n", OS_BSD);
-  printf("OS MAC:         %d\n", OS_MAC);
-  printf("OS Windows:     %d\n", OS_WINDOWS);
+  Info("OS GNU/Linux:   %d", OS_LINUX);
+  Info("OS BSD:         %d", OS_BSD);
+  Info("OS MAC:         %d", OS_MAC);
+  Info("OS Windows:     %d", OS_WINDOWS);
 
-  printf("Architecture x86 32bit: %d\n", ARCH_X86);
-  printf("Architecture x64 64bit: %d\n", ARCH_X64);
-  printf("Architecture ARM 32bit: %d\n", ARCH_ARM32);
-  printf("Architecture ARM 64bit: %d\n", ARCH_ARM64);
+  Info("Architecture x86 32bit: %d", ARCH_X86);
+  Info("Architecture x64 64bit: %d", ARCH_X64);
+  Info("Architecture ARM 32bit: %d", ARCH_ARM32);
+  Info("Architecture ARM 64bit: %d", ARCH_ARM64);
 #endif
 
 }

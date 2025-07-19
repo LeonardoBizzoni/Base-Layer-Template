@@ -22,7 +22,7 @@ no_annoying_cpp_warnings="-Wno-gnu-anonymous-struct -Wno-gnu-anonymous-struct
                           -Wno-nested-anon-types"
 
 opt_flags="-O3 -s"
-dbg_flags="-O0 -g3 -fvisibility=hidden -ggdb -DENABLE_ASSERT=1 -DDEBUG=1"
+dbg_flags="-O0 -g3 -ggdb -DENABLE_ASSERT=1 -DDEBUG=1"
 
 asan="-fsanitize=address,undefined"
 gui_mode="-DOS_GUI=1"
@@ -63,8 +63,8 @@ if [ ! -v cross ]; then
         flags+="$dbg_flags "
         if [ "$os" == "LNX" ]; then
             flags+="$asan "
-        # elif [ "$os" == "BSD" ]; then
-        #     i can't get asan to work on bsd
+        elif [ "$os" == "BSD" ]; then
+            flags+="$asan "
         # elif [ "$os" == "MACOS" ]; then
         #     don't know if asan works on macos
         fi
@@ -78,7 +78,17 @@ if [ ! -v cross ]; then
             if [ "$display_server" == "x11" ]; then
                 flags+="-D${os}_X11=1 -lX11 -lXext "
             else
-                flags+="-D${os}_Wayland=1 "
+                flags+="-D${os}_WAYLAND=1 -lwayland-client "
+                wayland-scanner private-code                                                \
+                                /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml \
+                                ./src/base/OS/gfx/Unix/Wayland/xdg-shell-protocol.c
+                wayland-scanner client-header                                               \
+                                /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml \
+                                ./src/base/OS/gfx/Unix/Wayland/xdg-shell-client-protocol.h
+            fi
+
+            if [[ $os == "BSD" ]]; then
+                flags+="-I/usr/local/include -L/usr/local/lib "
             fi
         fi
 
