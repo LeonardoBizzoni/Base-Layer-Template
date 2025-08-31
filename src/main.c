@@ -2,9 +2,11 @@
 
 #include <base/base_inc.h>
 #include <OS/os_inc.h>
+#include <math/math_inc.h>
 
 #include <base/base_inc.c>
 #include <OS/os_inc.c>
+#include <math/math_inc.c>
 
 fn void start(CmdLine *cli) {
 #if 1
